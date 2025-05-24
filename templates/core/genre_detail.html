@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+<!-- title -->
+{% block title %}{{ genre.name }} - MusicWave{% endblock %}
+<!-- content -->
+{% block content %}
+  <!-- Genre Header Section -->
+  <section class="genre-header py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-3 mb-4 mb-md-0">
+          {% if genre.image %}
+            <img src="{{ genre.image.url }}"
+                 alt="{{ genre.name }}"
+<<<<<<< HEAD
+                 class="img-fluid rounded shadow genre-cover"
+                 width="300"
+                 height="300" />
+          {% else %}
+            <img src="{% static 'images/default-cover.png' %}"
+                 alt="{{ genre.name }}"
+                 class="img-fluid rounded shadow genre-cover"
+                 width="300"
+                 height="300" />
+=======
+                 width="300"
+                 height="300"
+                 class="img-fluid rounded shadow genre-cover" />
+          {% else %}
+            <img src="{% static 'images/default-cover.png' %}"
+                 alt="{{ genre.name }}"
+                 width="300"
+                 height="300"
+                 class="img-fluid rounded shadow genre-cover" />
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+          {% endif %}
+        </div>
+        <div class="col-md-9">
+          <h1 class="display-4 fw-bold">{{ genre.name }}</h1>
+          {% if genre.description %}<p class="lead">{{ genre.description }}</p>{% endif %}
+          <div class="d-flex align-items-center mt-3">
+            <span class="text-muted me-3">
+              <i class="fas fa-music me-1"></i> {{ music_list.count }} songs
+            </span>
+            <span class="text-muted">
+              <i class="fas fa-calendar-alt me-1"></i> Added {{
+              genre.created_at|date:"M d, Y" }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Genre Music List Section -->
+  <section class="genre-music-list py-5 bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-9">
+          <h2 class="mb-4">Music in {{ genre.name }}</h2>
+          {% if music_list %}
+            <div class="list-group music-list shadow-sm">
+              {% for music in music_list %}
+                <div class="list-group-item list-group-item-action p-0">
+                  <div class="d-flex align-items-center">
+                    <div class="music-cover-small">
+                      {% if music.cover_image %}
+                        <img src="{{ music.cover_image.url }}"
+                             alt="{{ music.title }}"
+                             width="60"
+                             height="60" />
+                      {% else %}
+                        <img src="{% static 'images/default-cover.png' %}"
+                             alt="{{ music.title }}"
+                             width="60"
+                             height="60" />
+                      {% endif %}
+<<<<<<< HEAD
+                      <div class="play-overlay">
+                        <button class="play-btn"
+                                data-music-id="{{ music.id }}"
+                                data-music-title="{{ music.title }}"
+                                data-music-artist="{{ music.artist }}"
+                                data-music-file="{{ music.audio_file.url }}"
+                                data-music-cover="{% if music.cover_image %}{{ music.cover_image.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}">
+                          <i class="fas fa-play"></i>
+                        </button>
+                      </div>
+=======
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+                    </div>
+                    <div class="flex-grow-1 ms-3 py-3">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                          <a href="{% url 'music_detail' music.id %}">{{ music.title }}</a>
+                        </h5>
+                        <div class="d-flex align-items-center">
+                          <span class="text-muted me-3">
+                            <i class="fas fa-play me-1"></i> {{ music.plays_count }}
+                          </span>
+                          <div class="play-btn"
+                               data-music-id="{{ music.id }}"
+                               data-music-title="{{ music.title }}"
+                               data-music-artist="{{ music.artist }}"
+                               data-music-file="{{ music.audio_file.url }}"
+                               data-music-cover="{% if music.cover_image %}{{ music.cover_image.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}">
+                            <i class="fas fa-play"></i>
+                          </div>
+                          {% if user.is_authenticated %}<!-- "Add to Playlist" button removed -->{% endif %}
+                        </div>
+                      </div>
+                      <p class="text-muted mb-0">
+                        {{ music.artist }}
+                        {% if music.album %}
+                          • {{ music.album }}
+                          <!-- a -->
+                        {% endif %}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="alert alert-info">No music found in this genre yet.</div>
+          {% endif %}
+        </div>
+        <div class="col-md-3">
+          <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">Related Genres</h5>
+            </div>
+            <div class="list-group list-group-flush">
+              {% for related in related_genres %}
+                <a href="{% url 'genre_detail' related.id %}"
+                   class="list-group-item list-group-item-action d-flex align-items-center">
+                  {% if related.image %}
+                    <img src="{{ related.image.url }}"
+                         alt="{{ related.name }}"
+<<<<<<< HEAD
+                         class="related-genre-img me-2"
+                         width="30"
+                         height="30" />
+                  {% else %}
+                    <img src="{% static 'images/default-cover.png' %}"
+                         alt="{{ related.name }}"
+                         class="related-genre-img me-2"
+                         width="30"
+                         height="30" />
+=======
+                         width="30"
+                         height="30"
+                         class="related-genre-img me-2" />
+                  {% else %}
+                    <img src="{% static 'images/default-cover.png' %}"
+                         alt="{{ related.name }}"
+                         width="30"
+                         height="30"
+                         class="related-genre-img me-2" />
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+                  {% endif %}
+                  <span>{{ related.name }}</span>
+                </a>
+              {% empty %}
+                <div class="list-group-item text-muted">
+                  <span class="text-white">No related genres found.</span>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+{% block extra_css %}
+  <style>
+  .genre-cover {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: cover;
+  }
+
+  .related-genre-img {
+    border-radius: 4px;
+    object-fit: cover;
+  }
+
+  .music-cover-small {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+  }
+
+  .music-cover-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .play-btn {
+    width: 36px;
+    height: 36px;
+    background-color: var(--bs-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .play-btn:hover {
+    transform: scale(1.1);
+    background-color: var(--bs-primary-darker);
+  }
+<<<<<<< HEAD
+
+  .text-white {
+    color: white !important;
+=======
+  
+  .text-white {
+    color: white;
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+  }
+  </style>
+{% endblock %}
+{% block extra_js %}
+  <script>
+  $(document).ready(function () {
+    // The global handler in main.js already handles play button clicks
+    // This is just to ensure the song title is also clickable to play the song
+    $(".music-list .list-group-item-action").on("click", function (e) {
+      // Only trigger if the click is directly on the list item (not on a child element like the play button or title link)
+      if (e.target === this) {
+        // Find the play button in this item and trigger its click
+        $(this).find(".play-btn").trigger("click");
+      }
+    });
+  });
+  </script>
+{% endblock %}

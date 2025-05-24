@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Create Playlist -
+  MusicWave
+{% endblock %}
+{% block content %}
+  <section class="create-playlist-section py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card auth-card">
+            <div class="card-body p-4 p-md-5">
+              <div class="text-center mb-4">
+                <h1 class="h3 text-white">Create New Playlist</h1>
+<<<<<<< HEAD
+                <p class="text-muted text-white">Organize your favorite music into playlists</p>
+=======
+                <p class="text-muted text-white-important">Organize your favorite music into playlists</p>
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+              </div>
+              {% if messages %}
+                <div class="messages mb-4">
+                  {% for message in messages %}
+                    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
+                         role="alert">
+                      {{ message }}
+                      <button type="button"
+                              class="btn-close"
+                              data-bs-dismiss="alert"
+                              aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+              <form method="post"
+                    action="{% url 'create_playlist' %}"
+                    enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="name" class="form-label">Playlist Name*</label>
+                  <input type="text"
+                         class="form-control"
+                         id="name"
+                         name="name"
+                         required
+                         placeholder="My Awesome Playlist" />
+                </div>
+                <div class="mb-3">
+                  <label for="description" class="form-label">Description</label>
+                  <textarea class="form-control"
+                            id="description"
+                            name="description"
+                            rows="3"
+                            placeholder="Tell us about your playlist..."></textarea>
+                  <div class="form-text">Optional: Add a description for your playlist</div>
+                </div>
+                <div class="mb-4">
+                  <label for="cover_image" class="form-label">Cover Image</label>
+                  <input type="file"
+                         class="form-control"
+                         id="cover_image"
+                         name="cover_image"
+                         accept="image/*" />
+                  <div class="form-text">Optional: Upload a cover image for your playlist</div>
+                </div>
+                <div class="mb-4 form-check">
+                  <input type="checkbox"
+                         class="form-check-input"
+                         id="is_public"
+                         name="is_public"
+                         checked />
+                  <label class="form-check-label text-white" for="is_public">Make this playlist public</label>
+                  <div class="form-text">Public playlists can be viewed by all users</div>
+                </div>
+                <div class="d-grid gap-2">
+                  <button type="submit" class="btn btn-primary btn-lg">Create Playlist</button>
+                  <a href="{% url 'playlist_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+{% block extra_css %}
+  <style>
+  .create-playlist-section {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+  }
+
+  .auth-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .auth-card h1 {
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  
+  .text-white {
+    color: white;
+  }
+  
+  .text-white-important {
+    color: white !important;
+  }
+  
+  .form-check-label.text-white {
+    color: white;
+  }
+
+  .form-control {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .form-control:focus {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25);
+  }
+
+  .form-text {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+
+  .form-check-input {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-color: var(--border-color);
+  }
+
+  .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+<<<<<<< HEAD
+
+  .text-white {
+    color: white !important;
+  }
+=======
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+  </style>
+{% endblock %}

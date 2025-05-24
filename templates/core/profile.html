@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  {{ user.username }}
+  - Profile - MusicWave
+{% endblock %}
+{% block content %}
+  <section class="profile-section py-5">
+    <div class="container">
+      <div class="row">
+        <!-- Profile Sidebar -->
+        <div class="col-lg-4 mb-4">
+          <div class="profile-card">
+            <div class="profile-header">
+              <div class="profile-avatar">
+                {% if user.profile_image %}
+                  <img src="{{ user.profile_image.url }}"
+                       alt="{{ user.username }}"
+                       class="rounded-circle profile-image"
+                       width="150"
+                       height="150" />
+                {% else %}
+                  <div class="profile-placeholder mb-3">
+                    <i class="fas fa-user fa-4x text-muted"></i>
+                  </div>
+                {% endif %}
+              </div>
+              <h3 class="profile-name">{{ user.username }}</h3>
+              {% if user.first_name or user.last_name %}
+                <p class="profile-fullname">{{ user.first_name }} {{ user.last_name }}</p>
+              {% endif %}
+            </div>
+            <div class="profile-body">
+              {% if user.bio %}
+                <div class="profile-bio">
+                  <h5>Bio</h5>
+                  <p>{{ user.bio }}</p>
+                </div>
+              {% endif %}
+              <div class="profile-meta">
+                <div class="profile-meta-item">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span>Joined {{ user.date_joined|date:"F Y" }}</span>
+                </div>
+                <div class="profile-meta-item">
+                  <i class="fas fa-headphones-alt"></i>
+                  <span>{{ recent_plays.count }} Plays</span>
+                </div>
+                <div class="profile-meta-item">
+                  <i class="fas fa-list"></i>
+                  <span>{{ playlists.count }} Playlists</span>
+                </div>
+              </div>
+              <div class="profile-actions mt-4">
+                <a href="{% url 'edit_profile' %}" class="btn btn-primary w-100">
+                  <i class="fas fa-edit me-2"></i> Edit Profile
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Profile Content -->
+        <div class="col-lg-8">
+          <!-- User's Playlists -->
+          <div class="content-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4>Your Playlists</h4>
+              <a href="{% url 'create_playlist' %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus me-1"></i> Create Playlist
+              </a>
+            </div>
+            <div class="row g-3">
+              {% for playlist in playlists %}
+                <div class="col-md-4">
+                  <div class="playlist-card">
+                    <a href="{% url 'playlist_detail' playlist.id %}">
+                      <div class="playlist-card-img">
+                        {% if playlist.cover_image %}
+                          <img src="{{ playlist.cover_image.url }}"
+                               alt="{{ playlist.name }}"
+                               class="rounded me-3 playlist-cover"
+                               width="60"
+                               height="60" />
+                        {% else %}
+                          <img src="{% static 'images/default-playlist-cover.png' %}"
+                               alt="{{ playlist.name }}"
+                               class="rounded me-3 playlist-cover"
+                               width="60"
+                               height="60" />
+                        {% endif %}
+                      </div>
+                      <div class="playlist-card-body">
+                        <h5>{{ playlist.name }}</h5>
+                        <p class="text-muted">{{ playlist.items.count }} songs</p>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              {% empty %}
+                <div class="col-12">
+                  <div class="text-center py-4">
+                    <p>You haven't created any playlists yet.</p>
+                    <a href="{% url 'create_playlist' %}" class="btn btn-primary">
+                      <i class="fas fa-plus me-2"></i> Create Your First Playlist
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          <!-- Recently Played -->
+          <div class="content-card">
+            <h4 class="mb-3">Recently Played</h4>
+            <div class="list-group">
+              {% for play in recent_plays %}
+                <div class="list-group-item list-group-item-action">
+                  <div class="d-flex w-100">
+                    <div class="flex-shrink-0 me-3">
+                      {% if play.music.cover_image %}
+                        <img src="{{ play.music.cover_image.url }}"
+                             alt="{{ play.music.title }}"
+                             width="60"
+                             height="60"
+                             class="list-cover-img" />
+                      {% else %}
+                        <img src="{% static 'images/default-cover.png' %}"
+                             alt="{{ play.music.title }}"
+                             width="60"
+                             height="60"
+                             class="list-cover-img" />
+                      {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ play.music.title }}</h5>
+                        <small class="text-muted">{{ play.played_at|timesince }} ago</small>
+                      </div>
+                      <p class="mb-1">{{ play.music.artist }}</p>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-secondary">{{ play.music.genre }}</span>
+                        <div class="btn-group">
+                          <button class="btn btn-sm btn-primary play-btn"
+                                  data-music-id="{{ play.music.id }}"
+                                  data-music-title="{{ play.music.title }}"
+                                  data-music-artist="{{ play.music.artist }}"
+                                  data-music-file="{{ play.music.audio_file.url }}"
+                                  data-music-cover="{% if play.music.cover_image %}{{ play.music.cover_image.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}">
+                            <i class="fas fa-play me-1"></i> Play
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% empty %}
+                <div class="text-center py-4">
+                  <p>You haven't played any music yet.</p>
+                  <a href="{% url 'music_list' %}" class="btn btn-primary">
+                    <i class="fas fa-music me-2"></i> Explore Music
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+{% block extra_css %}
+  <style>
+  .profile-card {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .profile-header {
+    padding: 30px;
+    text-align: center;
+    background: linear-gradient(
+      135deg,
+      var(--primary-dark) 0%,
+      var(--primary-color) 100%
+    );
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+  }
+
+  .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-placeholder {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border-radius: 50%;
+  }
+
+  .profile-name {
+    color: white;
+    margin-bottom: 5px;
+  }
+
+  .profile-fullname {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0;
+  }
+
+  .profile-body {
+    padding: 20px;
+  }
+
+  .profile-bio {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .profile-meta {
+    margin-bottom: 20px;
+  }
+
+  .profile-meta-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .profile-meta-item i {
+    width: 20px;
+    margin-right: 10px;
+    color: var(--primary-color);
+  }
+
+  .content-card {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .playlist-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  .playlist-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .playlist-card a {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .playlist-card-img {
+    position: relative;
+    overflow: hidden;
+    height: 0;
+    padding-top: 100%; /* 1:1 Aspect Ratio */
+  }
+
+  .playlist-card-img img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .playlist-cover {
+    object-fit: cover;
+  }
+
+  .text-dark {
+    color: black !important;
+  }
+  </style>
+{% endblock %}

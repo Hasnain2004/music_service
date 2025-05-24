@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+{% load static %}
+<!-- title -->
+{% block title %}Search Results - MusicWave{% endblock %}
+{% block content %}
+  <section class="search-results-section py-5">
+    <div class="container">
+      <div class="search-header mb-5">
+        <h1>Search Results for "{{ query }}"</h1>
+        <p class="text-muted">
+          Found {{ music_count }} songs, {{ playlists_count }} playlists, and
+          <!-- a -->
+          {{ users_count }} users
+        </p>
+      </div>
+      <!-- Music Results -->
+      <div class="section-container mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="section-title">Songs</h2>
+          {% if music_results.count > 5 %}
+            <a href="{% url 'music_list' %}?q={{ query }}"
+               class="btn btn-sm btn-outline-light">View All</a>
+          {% endif %}
+        </div>
+        {% if music_results %}
+          <div class="table-responsive">
+            <table class="table table-dark table-hover">
+              <thead>
+                <tr>
+                  <th class="col-number">#</th>
+                  <th>Title</th>
+                  <th>Artist</th>
+                  <th>Album</th>
+                  <th>Genre</th>
+                  <th class="col-duration">Duration</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for music in music_results|slice:":5" %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="song-cover me-2">
+                          {% if music.cover_image %}
+                            <img src="{{ music.cover_image.url }}"
+                                 alt="{{ music.title }}"
+                                 class="music-cover"
+                                 width="40"
+                                 height="40" />
+                          {% else %}
+                            <img src="{% static 'images/default-cover.png' %}"
+                                 alt="{{ music.title }}"
+                                 class="music-cover"
+                                 width="40"
+                                 height="40" />
+                          {% endif %}
+                          <div class="play-overlay">
+                            <button class="play-btn"
+                                    data-music-id="{{ music.id }}"
+                                    data-music-title="{{ music.title }}"
+                                    data-music-artist="{{ music.artist }}"
+                                    data-music-file="{{ music.audio_file.url }}"
+                                    data-music-cover="{% if music.cover_image %}{{ music.cover_image.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}">
+                              <i class="fas fa-play"></i>
+                            </button>
+                          </div>
+                        </div>
+                        <a href="{% url 'music_detail' music.id %}" class="song-title">{{ music.title }}</a>
+                      </div>
+                    </td>
+                    <td>{{ music.artist }}</td>
+                    <td>{{ music.album|default:"-" }}</td>
+                    <td>{{ music.genre }}</td>
+                    <td>{{ music.duration|floatformat:"2" }} min</td>
+                    <td class="text-end">
+                      <div class="dropdown">
+                        <button class="btn btn-sm btn-icon"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                          <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                          <li>
+                            <a class="dropdown-item" href="{% url 'music_detail' music.id %}">View Details</a>
+                          </li>
+                          {% if user.is_authenticated %}
+                            <li>
+                              <button class="dropdown-item add-to-playlist-btn"
+                                      data-music-id="{{ music.id }}"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#add-to-playlist-modal">Add to Playlist</button>
+                            </li>
+                          {% endif %}
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="empty-state text-center py-4">
+            <p>No songs found matching "{{ query }}"</p>
+          </div>
+        {% endif %}
+      </div>
+      <!-- Playlist Results -->
+      <div class="section-container mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="section-title">Playlists</h2>
+          {% if playlists_results.count > 4 %}
+            <a href="{% url 'playlist_list' %}?q={{ query }}"
+               class="btn btn-sm btn-outline-light">View All</a>
+          {% endif %}
+        </div>
+        {% if playlists_results %}
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {% for playlist in playlists_results|slice:":4" %}
+              <div class="col">
+                <div class="card playlist-card h-100">
+                  <a href="{% url 'playlist_detail' playlist.id %}"
+                     class="playlist-cover-link">
+                    {% if playlist.cover_image %}
+                      <img src="{{ playlist.cover_image.url }}"
+                           class="card-img-top playlist-cover"
+                           alt="{{ playlist.name }}"
+                           width="60"
+                           height="60" />
+                    {% else %}
+                      <div class="playlist-default-cover">
+                        <i class="fas fa-music"></i>
+                      </div>
+                    {% endif %}
+                  </a>
+                  <div class="card-body">
+                    <h5 class="card-title">{{ playlist.name }}</h5>
+                    <p class="card-text text-muted">By {{ playlist.creator.username }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="badge bg-secondary">{{ playlist.music_count }} songs</span>
+                      {% if playlist.is_public %}
+                        <span class="badge bg-success">Public</span>
+                      {% else %}
+                        <span class="badge bg-secondary">Private</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state text-center py-4">
+            <p>No playlists found matching "{{ query }}"</p>
+          </div>
+        {% endif %}
+      </div>
+      <!-- User Results -->
+      <div class="section-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="section-title">Users</h2>
+          {% if users_results.count > 4 %}<a href="#" class="btn btn-sm btn-outline-light">View All</a>{% endif %}
+        </div>
+        {% if users_results %}
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {% for user_profile in users_results|slice:":4" %}
+              <div class="col">
+                <div class="card user-card h-100">
+                  <div class="card-body text-center">
+                    <div class="user-avatar mb-3">
+                      {% if user_profile.avatar %}
+                        <img src="{{ user_profile.avatar.url }}"
+                             alt="{{ user_profile.username }}"
+                             width="80"
+                             height="80" />
+                      {% else %}
+                        <div class="default-avatar">{{ user_profile.username|slice:":1"|upper }}</div>
+                      {% endif %}
+                    </div>
+                    <h5 class="card-title">{{ user_profile.username }}</h5>
+                    {% if user_profile.full_name %}<p class="card-text text-muted">{{ user_profile.full_name }}</p>{% endif %}
+                    <a href="{% url 'profile' user_profile.username %}"
+                       class="btn btn-sm btn-outline-light mt-2">View Profile</a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state text-center py-4">
+            <p>No users found matching "{{ query }}"</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  <!-- Include Add to Playlist Modal -->
+  {% include 'core/components/add_to_playlist_modal.html' %}
+{% endblock %}
+<!-- css -->
+{% block extra_css %}
+  <style>
+  .search-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0;
+  }
+
+  .section-container {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    padding: 25px;
+    border: 1px solid var(--border-color);
+  }
+
+  .song-cover {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+
+  .song-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .song-cover:hover .play-overlay {
+    opacity: 1;
+  }
+
+  .play-overlay .play-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .song-title {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .song-title:hover {
+    color: var(--primary-color);
+  }
+
+  .table-dark {
+    background-color: transparent;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .table-dark thead th {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+  }
+
+  .table-dark tbody td {
+    border-color: var(--border-color);
+    vertical-align: middle;
+  }
+
+  .btn-icon {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+  }
+
+  .btn-icon:hover {
+    color: var(--text-primary);
+  }
+
+  .playlist-card {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  .playlist-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .playlist-cover-link {
+    display: block;
+    position: relative;
+    padding-top: 100%;
+    overflow: hidden;
+  }
+
+  .playlist-cover-link img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .playlist-default-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      var(--primary-dark) 0%,
+      var(--primary-color) 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+  }
+
+  .user-card {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  .user-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .default-avatar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      var(--primary-dark) 0%,
+      var(--primary-color) 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    font-weight: 600;
+  }
+
+  .empty-state {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    color: var(--text-secondary);
+  }
+
+  .music-cover {
+    object-fit: cover;
+  }
+
+  .playlist-cover {
+    object-fit: cover;
+  }
+
+  .col-number {
+    width: 50px;
+  }
+
+  .col-duration, .col-actions {
+    width: 100px;
+  }
+  </style>
+{% endblock %}
+{% block extra_js %}
+  <script>
+  $(document).ready(function () {
+    // Play button handler removed - now using global handler in main.js
+  });
+  </script>
+{% endblock %}

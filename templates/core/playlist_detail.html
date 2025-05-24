@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  {{ playlist.name }}
+  - MusicWave
+{% endblock %}
+{% block content %}
+  <section class="playlist-detail-section py-5">
+    <div class="container">
+      <!-- Playlist Header -->
+      <div class="playlist-header mb-4">
+        <div class="row align-items-center">
+          <div class="col-md-3 mb-4 mb-md-0">
+            {% if playlist.cover_image %}
+              <img src="{{ playlist.cover_image.url }}"
+                   alt="{{ playlist.name }}"
+                   class="playlist-cover"
+                   width="300"
+                   height="300" />
+            {% else %}
+              <div class="playlist-default-cover">
+                <i class="fas fa-music"></i>
+              </div>
+            {% endif %}
+          </div>
+          <div class="col-md-9">
+            <div class="playlist-info">
+              <div class="d-flex align-items-center">
+                <span class="playlist-label me-2">PLAYLIST</span>
+                {% if playlist.is_public %}
+                  <span class="badge bg-success">Public</span>
+                {% else %}
+                  <span class="badge bg-secondary">Private</span>
+                {% endif %}
+              </div>
+              <h1>{{ playlist.name }}</h1>
+              {% if playlist.description %}<p class="playlist-description">{{ playlist.description }}</p>{% endif %}
+              <div class="playlist-meta">
+                <span>Created by
+                  <strong>{{ playlist.creator.username }}</strong></span>
+                <span class="mx-2">•</span>
+                <span>{{ items|length }} songs</span>
+                <span class="mx-2">•</span>
+                <span>Created {{ playlist.created_at|date:"F j, Y" }}</span>
+              </div>
+              <div class="playlist-actions mt-3">
+                {% if items %}
+                  <button class="btn btn-primary play-all-btn">
+                    <i class="fas fa-play me-2"></i> Play All
+                  </button>
+                {% endif %}
+                {% if playlist.creator == user or user.is_staff %}
+                  <button class="btn btn-outline-light ms-2"
+                          data-bs-toggle="modal"
+                          data-bs-target="#editPlaylistModal">
+                    <i class="fas fa-edit me-2"></i> Edit
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Playlist Songs -->
+      <div class="playlist-songs">
+        {% if items %}
+          <!-- a -->
+          {% if playlist.is_public or playlist.creator == user or user.is_staff %}
+            <div class="table-responsive">
+              <table class="table table-dark table-hover">
+                <thead>
+                  <tr>
+                    <th class="col-number">#</th>
+                    <th>Title</th>
+                    <th>Artist</th>
+                    <th>Album</th>
+                    <th class="col-duration">Duration</th>
+                    <th class="col-actions"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in items %}
+                    <tr>
+                      <td>{{ forloop.counter }}</td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="song-cover me-2">
+                            {% if item.music.cover_image %}
+                              <img src="{{ item.music.cover_image.url }}"
+                                   alt="{{ item.music.title }}"
+                                   width="40"
+                                   height="40" />
+                            {% else %}
+                              <img src="{% static 'images/default-cover.png' %}"
+                                   alt="{{ item.music.title }}"
+                                   width="40"
+                                   height="40" />
+                            {% endif %}
+                            <div class="play-overlay">
+                              <button class="play-btn"
+                                      data-music-id="{{ item.music.id }}"
+                                      data-music-title="{{ item.music.title }}"
+                                      data-music-artist="{{ item.music.artist }}"
+                                      data-music-file="{{ item.music.audio_file.url }}"
+                                      data-music-cover="{% if item.music.cover_image %}{{ item.music.cover_image.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}">
+                                <i class="fas fa-play"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <span>{{ item.music.title }}</span>
+                        </div>
+                      </td>
+                      <td>{{ item.music.artist }}</td>
+                      <td>{{ item.music.album|default:"-" }}</td>
+                      <td>{{ item.music.duration|floatformat:"2" }} min</td>
+                      <td class="text-end">
+                        {% if playlist.creator == user %}
+                          <form method="post"
+                                action="{% url 'remove_from_playlist' item.id %}"
+                                class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Are you sure you want to remove this song from the playlist?')">
+                              <i class="fas fa-times"></i>
+                            </button>
+                          </form>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="private-playlist-message text-center py-5">
+              <i class="fas fa-lock fa-3x mb-3"></i>
+              <h4>This playlist is private</h4>
+              <p class="text-muted">Only the creator can view the songs in this playlist.</p>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="empty-state text-center py-5">
+            <i class="fas fa-music fa-3x mb-3"></i>
+            <h4>This playlist is empty</h4>
+            <p class="text-muted">Start adding songs to your playlist to enjoy your favorite music.</p>
+            <a href="{% url 'music_list' %}" class="btn btn-primary mt-3">
+              <i class="fas fa-search me-2"></i> Explore Music
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  <!-- Edit Playlist Modal -->
+  <div class="modal fade"
+       id="editPlaylistModal"
+       tabindex="-1"
+       aria-labelledby="editPlaylistModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title modal-text" id="editPlaylistModalLabel">Edit Playlist</h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <form method="post"
+              action="{% url 'edit_playlist' playlist.id %}"
+              enctype="multipart/form-data"
+              id="edit-playlist-form">
+          <div class="modal-body">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="name" class="form-label modal-text">Playlist Name*</label>
+              <input type="text"
+                     class="form-control modal-input"
+                     id="edit-name"
+                     name="name"
+                     value="{{ playlist.name }}"
+                     required />
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label modal-text">Description</label>
+              <textarea class="form-control modal-input" id="edit-description" name="description" rows="3">
+{{ playlist.description }}</textarea>
+              <div class="form-text modal-text">Optional: Add a description for your playlist</div>
+            </div>
+            <div class="mb-3">
+              <label for="cover_image" class="form-label modal-text">Cover Image</label>
+              {% if playlist.cover_image %}
+                <div class="current-cover mb-2">
+                  <p class="form-text modal-text">Current cover image:</p>
+                  <img src="{{ playlist.cover_image.url }}"
+                       alt="{{ playlist.name }}"
+                       width="100"
+                       height="100"
+                       class="img-thumbnail cover-preview" />
+                </div>
+              {% endif %}
+              <input type="file"
+                     class="form-control modal-input"
+                     id="edit-cover-image"
+                     name="cover_image"
+                     accept="image/*" />
+              <div class="form-text modal-text">Optional: Upload a new cover image for your playlist</div>
+            </div>
+            <div class="mb-3 form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="edit-is-public"
+                name="is_public"
+                {%
+                if
+                playlist.is_public
+                %}checked{%
+                endif
+                %}
+                />
+                <label class="form-check-label modal-text" for="edit-is-public">Make this playlist public</label>
+                <div class="form-text modal-text">Public playlists can be viewed by all users</div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endblock %}
+  {% block extra_css %}
+    <style>
+.playlist-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  height: 300px;
+}
+
+.playlist-default-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(
+    135deg,
+    var(--primary-dark) 0%,
+    var(--primary-color) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  height: 300px;
+}
+
+.playlist-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.playlist-info h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.playlist-description {
+  color: var(--text-secondary);
+  margin-bottom: 15px;
+}
+
+.playlist-meta {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.song-cover {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.song-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.song-cover:hover .play-overlay {
+  opacity: 1;
+}
+
+.play-overlay .play-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.table-dark {
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-dark thead th {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.table-dark tbody td {
+  border-color: var(--border-color);
+  vertical-align: middle;
+}
+
+.empty-state {
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  padding: 40px;
+}
+
+.empty-state i {
+  color: var(--primary-color);
+  opacity: 0.7;
+}
+
+.col-number {
+  width: 50px;
+}
+
+.col-duration, .col-actions {
+  width: 100px;
+}
+
+.modal-text {
+  color: black;
+}
+
+.modal-input {
+  color: black;
+}
+
+.cover-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+    </style>
+  {% endblock %}
+  {% block extra_js %}
+    <script>
+$(document).ready(function () {
+  // Play button and play-all button handlers removed - now using global handlers in main.js
+});
+    </script>
+  {% endblock %}

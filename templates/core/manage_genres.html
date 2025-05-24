@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Manage Genres -
+  MusicWave
+{% endblock %}
+{% block content %}
+  <section class="manage-genres-section py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Manage Genres</h2>
+            <button class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addGenreModal">
+              <i class="fas fa-plus"></i> Add New Genre
+            </button>
+          </div>
+          <!-- Genres List -->
+          <div class="card">
+            <div class="card-body">
+              {% if genres %}
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+<<<<<<< HEAD
+                        <th class="col-name">Name</th>
+                        <th class="col-image">Image</th>
+=======
+                        <th>Name</th>
+                        <th>Image</th>
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+                        <th>Description</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for genre in genres %}
+                        <tr>
+                          <td>{{ genre.name }}</td>
+                          <td>
+                            {% if genre.image %}
+                              <img src="{{ genre.image.url }}"
+                                   alt="{{ genre.name }}"
+                                   width="50"
+                                   height="50"
+                                   class="rounded" />
+                            {% else %}
+                              <span class="badge bg-secondary">No Image</span>
+                            {% endif %}
+                          </td>
+                          <td>{{ genre.description|default:"-" }}</td>
+                          <td>{{ genre.created_at|date:"M d, Y" }}</td>
+                          <td>
+                            <button class="btn btn-sm btn-outline-primary edit-genre-btn"
+                                    data-id="{{ genre.id }}"
+                                    data-name="{{ genre.name }}"
+                                    data-description="{{ genre.description|default:'' }}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editGenreModal">
+                              <i class="fas fa-edit"></i>
+                            </button>
+                            <a href="{% url 'genre_detail' genre.id %}"
+                               class="btn btn-sm btn-outline-success">
+                              <i class="fas fa-eye"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger delete-genre-btn"
+                                    data-id="{{ genre.id }}"
+                                    data-name="{{ genre.name }}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteGenreModal">
+                              <i class="fas fa-trash-alt"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="text-center py-4">
+                  <i class="fas fa-tag fa-3x text-muted mb-3"></i>
+                  <p>No genres have been added yet.</p>
+                  <p>Click the "Add New Genre" button to create your first genre.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Add Genre Modal -->
+  <div class="modal fade"
+       id="addGenreModal"
+       tabindex="-1"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add New Genre</h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <form method="post"
+              action="{% url 'manage_genres' %}"
+              enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add" />
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="genre-name" class="form-label">Genre Name</label>
+              <input type="text" class="form-control" id="genre-name" name="name" required />
+            </div>
+            <div class="mb-3">
+              <label for="genre-description" class="form-label">Description (Optional)</label>
+              <textarea class="form-control"
+                        id="genre-description"
+                        name="description"
+                        rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="genre-image" class="form-label">Genre Image (Optional)</label>
+              <input type="file"
+                     class="form-control"
+                     id="genre-image"
+                     name="image"
+                     accept="image/*" />
+              <div class="form-text">
+                Choose an image that represents this genre. Recommended size:
+                300x300px
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Add Genre</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Edit Genre Modal -->
+  <div class="modal fade"
+       id="editGenreModal"
+       tabindex="-1"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+<<<<<<< HEAD
+          <h5 class="modal-title text-dark">Edit Genre</h5>
+=======
+          <h5 class="modal-title">Edit Genre</h5>
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <form method="post"
+              action="{% url 'manage_genres' %}"
+              enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="edit" />
+          <input type="hidden" name="genre_id" id="edit-genre-id" />
+          <div class="modal-body">
+            <div class="mb-3">
+<<<<<<< HEAD
+              <label for="edit-genre-name" class="form-label text-dark">Genre Name</label>
+              <input type="text"
+                     class="form-control text-dark"
+=======
+              <label for="edit-genre-name" class="form-label">Genre Name</label>
+              <input type="text"
+                     class="form-control"
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+                     id="edit-genre-name"
+                     name="name"
+                     required />
+            </div>
+            <div class="mb-3">
+<<<<<<< HEAD
+              <label for="edit-genre-description" class="form-label text-dark">Description (Optional)</label>
+              <textarea class="form-control text-dark"
+=======
+              <label for="edit-genre-description" class="form-label">Description (Optional)</label>
+              <textarea class="form-control"
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+                        id="edit-genre-description"
+                        name="description"
+                        rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+<<<<<<< HEAD
+              <label for="edit-genre-image" class="form-label text-dark">Genre Image (Optional)</label>
+              <div class="current-cover mb-2 d-none">
+                <p class="form-text text-dark">Current cover image:</p>
+                <img id="current-cover-preview"
+                     src=""
+                     alt=""
+                     width="100"
+                     height="100"
+                     class="img-thumbnail current-image" />
+              </div>
+              <input type="file"
+                     class="form-control text-dark"
+                     id="edit-genre-image"
+                     name="image"
+                     accept="image/*" />
+              <div class="form-text text-dark">Optional: Upload a new cover image for your playlist</div>
+=======
+              <label for="edit-genre-image" class="form-label">Genre Image (Optional)</label>
+              <input type="file"
+                     class="form-control"
+                     id="edit-genre-image"
+                     name="image"
+                     accept="image/*" />
+              <div class="form-text">
+                Leave empty to keep the current image. Choose a new image to
+                replace it.
+              </div>
+              <div id="current-image-preview" class="mt-2 d-none">
+                <p>Current image:</p>
+                <img src=""
+                     alt="Current genre image"
+                     id="current-genre-image"
+                     style="max-width: 100%;
+                            max-height: 150px" />
+              </div>
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Delete Genre Modal -->
+  <div class="modal fade"
+       id="deleteGenreModal"
+       tabindex="-1"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete Genre</h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <form method="post" action="{% url 'manage_genres' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="delete" />
+          <input type="hidden" name="genre_id" id="delete-genre-id" />
+          <div class="modal-body">
+            <p>
+              Are you sure you want to delete the genre "<span id="delete-genre-name"></span>"?
+            </p>
+            <p class="text-danger">This action cannot be undone.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+<<<<<<< HEAD
+{% block extra_css %}
+  <style>
+  .col-name {
+    width: 200px;
+  }
+
+  .col-image {
+    width: 50px;
+  }
+
+  .text-dark {
+    color: black !important;
+  }
+
+  .current-image {
+    object-fit: cover;
+  }
+  </style>
+{% endblock %}
+=======
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+{% block extra_js %}
+  <script>
+  $(document).ready(function () {
+    // Edit Genre Modal
+    $(".edit-genre-btn").click(function () {
+      const id = $(this).data("id");
+      const name = $(this).data("name");
+      const description = $(this).data("description");
+      const hasImage = $(this).closest("tr").find("img").length > 0;
+      const imageSrc = hasImage
+        ? $(this).closest("tr").find("img").attr("src")
+        : "";
+
+      $("#edit-genre-id").val(id);
+      $("#edit-genre-name").val(name);
+      $("#edit-genre-description").val(description);
+
+      // Handle image preview
+      if (hasImage) {
+        $("#current-image-preview").removeClass("d-none");
+        $("#current-genre-image").attr("src", imageSrc);
+      } else {
+        $("#current-image-preview").addClass("d-none");
+      }
+    });
+
+    // Delete Genre Modal
+    $(".delete-genre-btn").click(function () {
+      const id = $(this).data("id");
+      const name = $(this).data("name");
+
+      $("#delete-genre-id").val(id);
+      $("#delete-genre-name").text(name);
+    });
+  });
+  </script>
+{% endblock %}

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}MusicWave - Your Music Streaming Service{% endblock %}
+    </title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Custom CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <style>
+      :root {
+        --primary-color: #8c52ff;
+        --primary-dark: #6a3cbf;
+        --primary-rgb: 140, 82, 255;
+        --text-primary: #f8f9fa;
+        --text-secondary: #adb5bd;
+        --card-bg: #2a2d3e;
+        --border-color: #3c3f51;
+        --admin-color: #ff5252;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #1a1c2a;
+        color: var(--text-primary);
+        background-image: url("https://images.unsplash.com/photo-1614149162883-504ce4d13909?q=80&w=1974&auto=format&fit=crop");
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+        background-blend-mode: overlay;
+      }
+
+      .navbar {
+        background-color: rgba(26, 28, 42, 0.9);
+        padding: 15px 0;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+      }
+
+      .footer {
+        background-color: rgba(26, 28, 42, 0.95);
+        box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.5);
+      }
+
+      .card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+      }
+
+      .music-player {
+        background-color: rgba(26, 28, 42, 0.95);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 15px 0;
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+      }
+
+      .admin-link {
+        color: var(--admin-color) !important;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .admin-link:hover {
+        background-color: var(--admin-color);
+        color: white !important;
+        border-radius: 5px;
+      }
+
+      .admin-badge {
+        background-color: var(--admin-color);
+        color: white;
+        font-size: 0.8rem;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-weight: 600;
+      }
+    </style>
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">
+          <i class="fas fa-music"></i> MusicWave
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.path == '/' %}active{% endif %}"
+                href="{% url 'index' %}"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if '/music/' in request.path %}active{% endif %}"
+                href="{% url 'music_list' %}"
+                >Explore</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.path == '/about/' %}active{% endif %}"
+                href="{% url 'about' %}"
+                >About</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.path == '/contact/' %}active{% endif %}"
+                href="{% url 'contact' %}"
+                >Contact</a
+              >
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a
+                class="nav-link {% if '/playlists/' in request.path %}active{% endif %}"
+                href="{% url 'playlist_list' %}"
+                >Playlists</a
+              >
+            </li>
+            {% if user.is_staff or user.is_superuser %}
+            <li class="nav-item">
+              <a
+                class="nav-link admin-link {% if '/admin/' in request.path %}active{% endif %}"
+                href="{% url 'admin:index' %}"
+                ><i class="fas fa-shield-alt me-1"></i>Admin</a
+              >
+            </li>
+            {% endif %} {% endif %}
+          </ul>
+
+          <form class="d-flex me-3" action="{% url 'search' %}" method="get">
+            <div class="input-group">
+              <input
+                class="form-control"
+                type="search"
+                name="q"
+                placeholder="Search music, playlists, users..."
+                aria-label="Search"
+              />
+              <button class="btn btn-outline-light" type="submit">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </form>
+
+          <ul class="navbar-nav ms-auto">
+            {% if user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                {% if user.profile_image %}
+                <img
+                  src="{{ user.profile_image.url }}"
+                  alt="{{ user.username }}"
+                  class="avatar-sm rounded-circle me-1"
+                />
+                {% else %}
+                <i class="fas fa-user-circle me-1"></i>
+                {% endif %} {{ user.username }}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="{% url 'profile' %}"
+                    ><i class="fas fa-user me-2"></i>My Profile</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'playlist_list' %}"
+                    ><i class="fas fa-list me-2"></i>My Playlists</a
+                  >
+                </li>
+                {% if user.is_staff or user.is_superuser %}
+                <li>
+                  <a class="dropdown-item" href="{% url 'admin:index' %}"
+                    ><i class="fas fa-cog me-2"></i>Admin Panel</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'manage_genres' %}"
+                    ><i class="fas fa-tags me-2"></i>Manage Genres</a
+                  >
+                </li>
+                {% endif %}
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'logout' %}"
+                    ><i class="fas fa-sign-out-alt me-2"></i>Logout</a
+                  >
+                </li>
+              </ul>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link btn btn-primary btn-sm rounded-pill px-3 ms-2"
+                href="{% url 'register' %}"
+                >Sign Up</a
+              >
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+      {% if messages %}
+      <div class="container mt-3">
+        {% for message in messages %}
+        <div
+          class="alert alert-{{ message.tags }} alert-dismissible fade show"
+          role="alert"
+        >
+          {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %} {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <h5><i class="fas fa-music"></i> MusicWave</h5>
+            <p>
+              Your ultimate music streaming experience. Discover, stream, and
+              share your favorite music.
+            </p>
+          </div>
+          <div class="col-md-4">
+            <h5>Quick Links</h5>
+            <ul class="list-unstyled">
+              <li><a href="{% url 'index' %}">Home</a></li>
+              <li><a href="{% url 'music_list' %}">Explore</a></li>
+              <li><a href="{% url 'about' %}">About</a></li>
+              <li><a href="{% url 'contact' %}">Contact</a></li>
+              {% if user.is_authenticated %}
+              <li><a href="{% url 'playlist_list' %}">Playlists</a></li>
+              <li><a href="{% url 'profile' %}">Profile</a></li>
+              {% else %}
+              <li><a href="{% url 'login' %}">Login</a></li>
+              <li><a href="{% url 'register' %}">Sign Up</a></li>
+              {% endif %}
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h5>Connect With Us</h5>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+          </div>
+        </div>
+        <hr />
+        <div class="text-center">
+          <p class="mb-0">
+            &copy; {% now "Y" %} MusicWave. All rights reserved.
+            <!-- a -->
+            {% if user.is_staff or user.is_superuser %}
+            <span class="admin-badge ms-2">Admin Mode</span>
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Music Player (Fixed at bottom) -->
+    <div id="music-player" class="music-player d-none">
+      <div class="container-fluid">
+        <div class="row align-items-center">
+          <div class="col-md-3">
+            <div class="d-flex align-items-center">
+              <img
+                id="player-cover"
+                src=""
+                alt="Album Cover"
+                class="player-cover me-3"
+              />
+              <div>
+                <h6 id="player-title" class="mb-0"></h6>
+                <small id="player-artist" class="text-muted"></small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="player-controls text-center">
+              <button id="prev-btn" class="btn btn-link">
+                <i class="fas fa-step-backward"></i>
+              </button>
+              <button id="play-btn" class="btn btn-link btn-lg">
+                <i class="fas fa-play"></i>
+              </button>
+              <button id="next-btn" class="btn btn-link">
+                <i class="fas fa-step-forward"></i>
+              </button>
+
+              <div class="progress mt-2">
+                <div
+                  id="progress-bar"
+                  class="progress-bar"
+                  role="progressbar"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <div class="d-flex justify-content-between mt-1">
+                <small id="current-time">0:00</small>
+                <small id="total-time">0:00</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="d-flex align-items-center justify-content-end">
+              <div class="volume-control ms-3">
+                <i class="fas fa-volume-up me-2"></i>
+                <input
+                  type="range"
+                  id="volume-slider"
+                  min="0"
+                  max="100"
+                  value="100"
+                  class="volume-slider"
+                />
+              </div>
+              <button
+                id="close-player-btn"
+                class="btn btn-sm btn-outline-light"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+
+    <!-- CSRF Token for AJAX -->
+    <script>
+      const csrftoken = "{{ csrf_token }}";
+    </script>
+  </body>
+</html>

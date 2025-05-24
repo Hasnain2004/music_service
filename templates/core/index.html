@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  MusicWave - Your
+  Music Streaming Service
+{% endblock %}
+{% block content %}
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <h1 class="display-4 fw-bold">Discover, Stream, and Share Your Favorite Music</h1>
+          <p class="lead my-4">
+            Enjoy unlimited access to millions of songs, create playlists, and
+            discover new music tailored to your taste.
+          </p>
+          {% if not user.is_authenticated %}
+            <div class="d-flex gap-3">
+              <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Get Started</a>
+              <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">Login</a>
+            </div>
+          {% else %}
+            <a href="{% url 'music_list' %}" class="btn btn-primary btn-lg">Explore Music</a>
+          {% endif %}
+        </div>
+        <div class="col-lg-6">
+          <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1470&auto=format&fit=crop"
+               alt="Music Streaming"
+               class="img-fluid hero-image rounded shadow-lg"
+<<<<<<< HEAD
+               width="1470"
+               height="980"
+=======
+               width="700"
+               height="500"
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+               id="hero-image" />
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Features Section -->
+  <section class="features-section py-5">
+    <div class="container">
+      <h2 class="text-center mb-5 text-white">Why Choose MusicWave?</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-headphones-alt"></i>
+            </div>
+            <h3>High Quality Audio</h3>
+            <p>
+              Experience crystal clear sound with our high-definition audio
+              streaming technology.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-list"></i>
+            </div>
+            <h3>Create Playlists</h3>
+            <p>Create and share personalized playlists with your favorite tracks.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Listen Anywhere</h3>
+            <p>
+              Enjoy your music on any device, anywhere, anytime with our
+              responsive platform.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Latest Music Section -->
+  <section class="latest-music-section py-5">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white">Latest Releases</h2>
+        <a href="{% url 'music_list' %}" class="btn btn-outline-primary">View All</a>
+      </div>
+      <div class="row g-4">
+        {% for music in latest_music %}
+          <div class="col-md-3">
+            <div class="music-card">
+              <div class="music-card-img">
+                {% if music.cover_image %}
+                  <img src="{{ music.cover_image.url }}"
+                       alt="{{ music.title }}"
+                       width="300"
+                       height="300" />
+                {% else %}
+                  <img src="{% static 'images/default-cover.png' %}"
+                       alt="{{ music.title }}"
+                       width="300"
+                       height="300" />
+                {% endif %}
+                <div class="play-btn"
+                     data-music-id="{{ music.id }}"
+                     data-music-title="{{ music.title }}"
+                     data-music-artist="{{ music.artist }}"
+                     data-music-file="{{ music.audio_file.url }}"
+                     data-music-cover="{% if music.cover_image %}{{ music.cover_image.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}">
+                  <i class="fas fa-play"></i>
+                </div>
+              </div>
+              <div class="music-card-body">
+                <h5>
+                  <a href="{% url 'music_detail' music.id %}">{{ music.title }}</a>
+                </h5>
+                <p class="text-muted">{{ music.artist }}</p>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <div class="alert alert-info">No music available yet.</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  <!-- Popular Music Section -->
+  <section class="popular-music-section py-5 bg-light">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+<<<<<<< HEAD
+        <h2 class="text-dark">Popular Tracks</h2>
+=======
+        <h2 class="text-black">Popular Tracks</h2>
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+        <a href="{% url 'music_list' %}?sort=popular"
+           class="btn btn-outline-primary">View All</a>
+      </div>
+      <div class="row g-4">
+        {% for music in popular_music %}
+          <div class="col-md-3">
+            <div class="music-card">
+              <div class="music-card-img">
+                {% if music.cover_image %}
+                  <img src="{{ music.cover_image.url }}"
+                       alt="{{ music.title }}"
+                       width="300"
+                       height="300" />
+                {% else %}
+                  <img src="{% static 'images/default-cover.png' %}"
+                       alt="{{ music.title }}"
+                       width="300"
+                       height="300" />
+                {% endif %}
+                <div class="play-btn"
+                     data-music-id="{{ music.id }}"
+                     data-music-title="{{ music.title }}"
+                     data-music-artist="{{ music.artist }}"
+                     data-music-file="{{ music.audio_file.url }}"
+                     data-music-cover="{% if music.cover_image %}{{ music.cover_image.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}">
+                  <i class="fas fa-play"></i>
+                </div>
+                <div class="play-count">
+                  <i class="fas fa-headphones-alt"></i> {{ music.plays_count }}
+                </div>
+              </div>
+              <div class="music-card-body">
+                <h5>
+                  <a href="{% url 'music_detail' music.id %}">{{ music.title }}</a>
+                </h5>
+                <p class="text-muted">{{ music.artist }}</p>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <div class="alert alert-info">No music available yet.</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  <!-- Genres Section -->
+  <section class="genres-section py-5">
+    <div class="container">
+      <h2 class="text-center mb-5 text-white">Browse by Genre</h2>
+      <div class="row g-4">
+        {% for genre in genres %}
+          <div class="col-md-3">
+            <a href="{% url 'genre_detail' genre.id %}" class="genre-card">
+              <div class="genre-card-img">
+                {% if genre.image %}
+                  <img src="{{ genre.image.url }}"
+                       alt="{{ genre.name }}"
+                       width="300"
+                       height="300" />
+                {% else %}
+                  <img src="{% static 'images/default-cover.png' %}"
+                       alt="{{ genre.name }}"
+                       width="300"
+                       height="300" />
+                {% endif %}
+                <div class="genre-name">{{ genre.name }}</div>
+              </div>
+            </a>
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <div class="alert alert-info">No genres available yet.</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  <!-- CTA Section -->
+  <section class="cta-section py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <h2>Ready to start your musical journey?</h2>
+          <p class="lead mb-0">Join MusicWave today and discover a world of music at your fingertips.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+          {% if not user.is_authenticated %}
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Sign Up Now</a>
+          {% else %}
+            <a href="{% url 'music_list' %}" class="btn btn-primary btn-lg">Explore Music</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+<<<<<<< HEAD
+=======
+{% block extra_css %}
+  <style>
+  .text-white {
+    color: white;
+  }
+  
+  .text-black {
+    color: rgb(0, 0, 0);
+  }
+  </style>
+{% endblock %}
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+{% block extra_js %}
+  <script>
+  $(document).ready(function () {
+    // Play button handler removed - now using global handler in main.js
+
+    // Handle hero image error
+    $("#hero-image").on("error", function () {
+      $(this).attr("src", "{% static 'images/hero-image.png' %}");
+    });
+
+    // Close player
+    $("#close-player-btn").on("click", function () {
+      $("#music-player").addClass("d-none");
+      // TODO: Stop audio playback
+    });
+  });
+  </script>
+<<<<<<< HEAD
+{% endblock %}
+{% block extra_css %}
+  <style>
+  .text-white {
+    color: white !important;
+  }
+
+  .text-dark {
+    color: rgb(0, 0, 0) !important;
+  }
+  </style>
+=======
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+{% endblock %}

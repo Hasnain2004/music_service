@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+<!-- title -->
+{% block title %}{{ music.title }} - MusicWave{% endblock %}
+<!-- content -->
+{% block content %}
+  <section class="music-detail-section py-5">
+    <div class="container">
+      <!-- Music Detail -->
+      <div class="music-detail">
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            {% if music.cover_image %}
+              <img src="{{ music.cover_image.url }}"
+                   alt="{{ music.title }}"
+                   class="img-fluid rounded mb-3 music-cover"
+                   width="80"
+                   height="80" />
+            {% else %}
+              <img src="{% static 'images/default-cover.png' %}"
+                   alt="{{ music.title }}"
+                   class="img-fluid rounded mb-3 music-cover"
+                   width="80"
+                   height="80" />
+            {% endif %}
+          </div>
+          <div class="col-md-8">
+            <div class="music-info">
+              <h1>{{ music.title }}</h1>
+              <p class="artist">{{ music.artist }}</p>
+              <div class="music-meta">
+                {% if music.album %}
+                  <div class="music-meta-item">
+                    <i class="fas fa-compact-disc"></i>
+                    <span>{{ music.album }}</span>
+                  </div>
+                {% endif %}
+                <div class="music-meta-item">
+                  <i class="fas fa-tag"></i>
+                  {% if music.genre_fk %}
+                    <a href="{% url 'genre_detail' music.genre_fk.id %}"
+                       class="text-decoration-none">{{ music.genre_fk.name }}</a>
+                  {% else %}
+                    <span>{{ music.genre|default:"Unknown" }}</span>
+                  {% endif %}
+                </div>
+                {% if music.release_date %}
+                  <div class="music-meta-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>{{ music.release_date|date:"F j, Y" }}</span>
+                  </div>
+                {% endif %}
+                <div class="music-meta-item">
+                  <i class="fas fa-clock"></i>
+                  <span>{{ music.duration|floatformat:"2" }} min</span>
+                </div>
+                <div class="music-meta-item">
+                  <i class="fas fa-headphones-alt"></i>
+                  <span>{{ music.plays_count }} plays</span>
+                </div>
+              </div>
+              <div class="d-flex gap-3 mb-4">
+                <button class="btn btn-primary"
+                        id="play-button"
+                        data-music-id="{{ music.id }}"
+                        data-music-title="{{ music.title }}"
+                        data-music-artist="{{ music.artist }}"
+                        data-music-file="{{ music.audio_file.url }}"
+                        data-music-cover="{% if music.cover_image %}{{ music.cover_image.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}">
+                  <i class="fas fa-play me-2"></i> Play
+                </button>
+                {% if user.is_authenticated %}
+                  <button class="btn btn-outline-light add-to-playlist-btn"
+                          data-music-id="{{ music.id }}"
+                          data-bs-toggle="modal"
+                          data-bs-target="#add-to-playlist-modal">
+                    <i class="fas fa-plus me-2"></i> Add to Playlist
+                  </button>
+                {% endif %}
+              </div>
+              {% if user.is_authenticated %}
+                <div class="rating-section mb-4">
+                  <h5>Rate this song:</h5>
+                  <div class="rating-stars">
+                    {% for i in "12345" %}
+                      <i class="fas fa-star rating-star {% if user_rating and user_rating.rating >= forloop.counter %}active{% endif %}"
+                         data-value="{{ forloop.counter }}"
+                         data-music-id="{{ music.id }}"></i>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Similar Music -->
+      {% if similar_music %}
+        <div class="similar-music mt-5">
+          <h3 class="mb-4">You may also like</h3>
+          <div class="row g-4">
+            {% for music in similar_music %}
+              <div class="col-md-3">
+                <div class="music-card">
+                  <div class="music-card-img">
+                    {% if music.cover_image %}
+                      <img src="{{ music.cover_image.url }}"
+                           alt="{{ music.title }}"
+                           width="80"
+                           height="80" />
+                    {% else %}
+                      <img src="{% static 'images/default-cover.png' %}"
+                           alt="{{ music.title }}"
+                           width="80"
+                           height="80" />
+                    {% endif %}
+                    <div class="play-btn"
+                         data-music-id="{{ music.id }}"
+                         data-music-title="{{ music.title }}"
+                         data-music-artist="{{ music.artist }}"
+                         data-music-file="{{ music.audio_file.url }}"
+                         data-music-cover="{% if music.cover_image %}{{ music.cover_image.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}">
+                      <i class="fas fa-play"></i>
+                    </div>
+                  </div>
+                  <div class="music-card-body">
+                    <h5>
+                      <a href="{% url 'music_detail' music.id %}">{{ music.title }}</a>
+                    </h5>
+                    <p class="text-muted">{{ music.artist }}</p>
+                    {% if user.is_authenticated %}
+                      <button class="btn btn-sm btn-outline-light add-to-playlist-btn"
+                              data-music-id="{{ music.id }}"
+                              data-bs-toggle="modal"
+                              data-bs-target="#add-to-playlist-modal">
+                        <i class="fas fa-plus me-1"></i> Add to Playlist
+                      </button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+  <!-- Include Add to Playlist Modal -->
+  {% include 'core/components/add_to_playlist_modal.html' %}
+{% endblock %}
+<!-- extra css -->
+{% block extra_css %}
+  <style>
+  .rating-stars .fa-star {
+    margin-right: 5px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .rating-stars .fa-star:hover,
+  .rating-stars .fa-star.active {
+    color: #ffc107;
+  }
+
+  .music-cover {
+    object-fit: cover;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .text-dark {
+    color: black !important;
+  }
+  </style>
+{% endblock %}
+{% block extra_js %}
+  <script>
+  $(document).ready(function () {
+    // Play button handler removed - now using global handler in main.js
+
+    // Rating stars hover effect
+    $(".rating-star").hover(
+      function () {
+        $(this).prevAll(".rating-star").addBack().addClass("hover");
+      },
+      function () {
+        $(this).prevAll(".rating-star").addBack().removeClass("hover");
+      }
+    );
+
+    // Rating stars click
+    $(".rating-star").on("click", function () {
+      const value = $(this).data("value");
+      const musicId = $(this).data("music-id");
+
+      // Update UI
+      $(".rating-star").removeClass("active");
+      $(this).prevAll(".rating-star").addBack().addClass("active");
+
+      // Submit rating
+      $.ajax({
+        url: `/music/${musicId}/rate/`,
+        type: "POST",
+        headers: { "X-CSRFToken": csrftoken },
+        data: {
+          rating: value,
+          liked: value >= 4, // Like if rating is 4 or 5
+        },
+        success: function (response) {
+          console.log("Rating submitted");
+        },
+      });
+    });
+  });
+  </script>
+{% endblock %}

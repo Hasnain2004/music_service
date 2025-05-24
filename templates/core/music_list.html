@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Explore Music - MusicWave{% endblock %}
+{% block content %}
+    <section class="music-list-section py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Filters Sidebar -->
+                <div class="col-lg-3 mb-4">
+                    <div class="filters-card">
+                        <h4 class="filters-title">Filters</h4>
+                        <form action="{% url 'music_list' %}" method="get">
+                            <!-- Search -->
+                            <div class="mb-3">
+                                <label for="search-input" class="form-label">Search</label>
+                                <input type="text"
+                                       class="form-control search-input"
+                                       id="search-input"
+                                       name="q"
+                                       value="{{ search_query }}"
+                                       placeholder="Search by title, artist...">
+                            </div>
+                            <!-- Genre Filter -->
+                            <div class="mb-3">
+                                <label for="genre-select" class="form-label">Genre</label>
+                                <select class="form-select genre-select" id="genre-select" name="genre">
+                                    <option value="">All Genres</option>
+                                    {% for genre in genres %}
+                                        <option value="{{ genre.name }}"
+                                                {% if genre.name == genre_filter %}selected{% endif %}>
+                                            {{ genre.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <!-- Sort By -->
+                            <div class="mb-4">
+                                <label for="sort-select" class="form-label">Sort By</label>
+                                <select class="form-select sort-select" id="sort-select" name="sort">
+                                    <option value="latest" {% if sort_by == 'latest' %}selected{% endif %}>Latest</option>
+                                    <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Most Popular</option>
+                                    <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Highest Rated</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                            <a href="{% url 'music_list' %}"
+                               class="btn btn-outline-secondary w-100 mt-2">Clear Filters</a>
+                        </form>
+                    </div>
+                </div>
+                <!-- Music List -->
+                <div class="col-lg-9">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Explore Music</h2>
+                        <div class="view-options">
+                            <button class="btn btn-outline-secondary btn-sm me-2 active"
+                                    id="grid-view-btn">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" id="list-view-btn">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Grid View (Default) -->
+                    <div id="grid-view" class="row g-4">
+                        {% for music in music_list %}
+                            <div class="col-md-4">
+                                <div class="music-card">
+                                    <div class="music-card-img">
+                                        {% if music.cover_image %}
+                                            <img src="{{ music.cover_image.url }}"
+                                                 alt="{{ music.title }}"
+                                                 class="music-cover"
+                                                 width="80"
+                                                 height="80">
+                                        {% else %}
+                                            <img src="{% static 'images/default-cover.png' %}"
+                                                 alt="{{ music.title }}"
+                                                 class="music-cover"
+                                                 width="80"
+                                                 height="80">
+                                        {% endif %}
+                                        <div class="play-btn"
+                                             data-music-id="{{ music.id }}"
+                                             data-music-title="{{ music.title }}"
+                                             data-music-artist="{{ music.artist }}"
+                                             data-music-file="{{ music.audio_file.url }}"
+                                             data-music-cover="{% if music.cover_image %}{{ music.cover_image.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}">
+                                            <i class="fas fa-play"></i>
+                                        </div>
+                                        <div class="play-count">
+                                            <i class="fas fa-headphones-alt"></i> {{ music.plays_count }}
+                                        </div>
+                                    </div>
+                                    <div class="music-card-body">
+                                        <h5>
+                                            <a href="{% url 'music_detail' music.id %}">{{ music.title }}</a>
+                                        </h5>
+                                        <p class="text-muted">{{ music.artist }}</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            {% if music.genre_fk %}
+                                                <a href="{% url 'genre_detail' music.genre_fk.id %}"
+                                                   class="badge bg-secondary text-decoration-none">{{ music.genre_fk.name }}</a>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ music.genre|default:"Unknown" }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12">
+                                <div class="alert alert-info">No music found matching your criteria. Try adjusting your filters.</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <!-- List View (Hidden by default) -->
+                    <div id="list-view" class="d-none">
+                        <div class="list-group">
+                            {% for music in music_list %}
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100">
+                                        <div class="flex-shrink-0 me-3">
+                                            {% if music.cover_image %}
+                                                <img src="{{ music.cover_image.url }}"
+                                                     alt="{{ music.title }}"
+                                                     class="list-cover-img music-cover"
+                                                     width="80"
+                                                     height="80">
+                                            {% else %}
+                                                <img src="{% static 'images/default-cover.png' %}"
+                                                     alt="{{ music.title }}"
+                                                     class="list-cover-img music-cover"
+                                                     width="80"
+                                                     height="80">
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">{{ music.title }}</h5>
+                                                <small class="text-muted">{{ music.duration|floatformat:"2" }} min</small>
+                                            </div>
+                                            <p class="mb-1">{{ music.artist }}</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {% if music.genre_fk %}
+                                                        <a href="{% url 'genre_detail' music.genre_fk.id %}"
+                                                           class="badge bg-secondary text-decoration-none">{{ music.genre_fk.name }}</a>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">{{ music.genre|default:"Unknown" }}</span>
+                                                    {% endif %}
+                                                    <small class="text-muted ms-2">
+                                                        <i class="fas fa-headphones-alt"></i> {{ music.plays_count }}
+                                                    </small>
+                                                </div>
+                                                <div class="btn-group">
+                                                    <button class="btn btn-sm btn-primary play-btn"
+                                                            data-music-id="{{ music.id }}"
+                                                            data-music-title="{{ music.title }}"
+                                                            data-music-artist="{{ music.artist }}"
+                                                            data-music-file="{{ music.audio_file.url }}"
+                                                            data-music-cover="{% if music.cover_image %}{{ music.cover_image.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}">
+                                                        <i class="fas fa-play me-1"></i> Play
+                                                    </button>
+                                                    <a href="{% url 'music_detail' music.id %}"
+                                                       class="btn btn-sm btn-outline-secondary">
+                                                        <i class="fas fa-info-circle me-1"></i> Details
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <div class="alert alert-info">No music found matching your criteria. Try adjusting your filters.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block extra_js %}
+    <script>
+    $(document).ready(function() {
+        // Toggle between grid and list view
+        $('#grid-view-btn').click(function() {
+            $(this).addClass('active');
+            $('#list-view-btn').removeClass('active');
+            $('#grid-view').removeClass('d-none');
+            $('#list-view').addClass('d-none');
+        });
+        
+        $('#list-view-btn').click(function() {
+            $(this).addClass('active');
+            $('#grid-view-btn').removeClass('active');
+            $('#list-view').removeClass('d-none');
+            $('#grid-view').addClass('d-none');
+        });
+        
+        // Play button handler removed - now using global handler in main.js
+    });
+    </script>
+{% endblock %}
+{% block extra_css %}
+    <style>
+    .search-input,
+    .genre-select,
+    .sort-select {
+        color: red;
+    }
+    .music-cover {
+  object-fit: cover;
+}
+
+.text-dark {
+  color: black !important;
+}
+    </style>
+{% endblock %}

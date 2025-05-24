@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+<!-- title -->
+{% block title %}
+  {% if form.instance.pk %}
+    Edit Playlist
+  {% else %}
+    <!-- a -->
+    Create Playlist
+  {% endif %}
+  - MusicWave
+{% endblock %}
+{% block content %}
+  <section class="playlist-form-section py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-body p-4 p-md-5">
+              <h1 class="h3 mb-4">
+                {% if form.instance.pk %}
+                  Edit Playlist
+                  <!-- a -->
+                {% else %}
+                  Create New Playlist
+                {% endif %}
+              </h1>
+              {% if messages %}
+                <div class="messages mb-4">
+                  {% for message in messages %}
+                    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
+                         role="alert">
+                      {{ message }}
+                      <button type="button"
+                              class="btn-close"
+                              data-bs-dismiss="alert"
+                              aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+              <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-4">
+                  <label for="{{ form.name.id_for_label }}" class="form-label">
+                    Playlist Name <span class="text-danger">*</span>
+                  </label>
+                  <input type="text"
+                         class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                         id="{{ form.name.id_for_label }}"
+                         name="{{ form.name.html_name }}"
+                         value="{{ form.name.value|default:'' }}"
+                         required />
+                  {% if form.name.errors %}
+                    <div class="invalid-feedback">
+                      {% for error in form.name.errors %}{{ error }}{% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="mb-4">
+                  <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                  <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="3">
+{{ form.description.value|default:'' }}</textarea>
+                  {% if form.description.errors %}
+                    <div class="invalid-feedback">
+                      {% for error in form.description.errors %}
+                        {{ error }}
+                        <!-- a -->
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <div class="form-text">
+                    Add a description to help others understand what your playlist
+                    is about.
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label for="{{ form.cover_image.id_for_label }}" class="form-label">Cover Image</label>
+                  <div class="d-flex align-items-center">
+                    {% if form.instance.cover_image %}
+                      <div class="current-cover me-3">
+                        <img src="{{ form.instance.cover_image.url }}"
+                             alt="Current cover"
+                             class="img-thumbnail current-image"
+                             width="200"
+                             height="200" />
+                      </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                      <input type="file"
+                             class="form-control {% if form.cover_image.errors %}is-invalid{% endif %}"
+                             id="{{ form.cover_image.id_for_label }}"
+                             name="{{ form.cover_image.html_name }}"
+                             accept="image/*" />
+                      {% if form.cover_image.errors %}
+                        <div class="invalid-feedback">
+                          {% for error in form.cover_image.errors %}
+                            {{ error }}
+                            <!-- a -->
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                      <div class="form-text">Upload a square image for best results. Max size: 2MB.</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="{{ form.is_public.id_for_label }}"
+                      name="{{ form.is_public.html_name }}"
+                      {%
+                      if
+                      form.is_public.value
+                      %}checked{%
+                      endif
+                      <<<<<<< HEAD
+                      =======
+                      %}
+                      >
+                      >>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+                      />
+                      <label class="form-check-label" for="{{ form.is_public.id_for_label }}">Make this playlist public</label>
+                    </div>
+                    <div class="form-text">
+                      Public playlists can be seen and played by everyone. Private
+                      playlists are only visible to you.
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-between mt-5">
+                    <a href="{% url 'playlist_list' %}" class="btn btn-outline-light">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                      {% if form.instance.pk %}
+                        Save Changes
+                      {% else %}
+                        Create
+                        Playlist
+                      {% endif %}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  {% endblock %}
+  {% block extra_css %}
+    <style>
+  .card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .form-control {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .form-control:focus {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25);
+  }
+
+  .form-text {
+    color: black;
+    font-size: 0.875rem;
+  }
+
+  .form-check-input {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-color: var(--border-color);
+  }
+
+  .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+<<<<<<< HEAD
+
+  .current-image {
+    object-fit: cover;
+  }
+
+  .text-dark {
+    color: black !important;
+  }
+=======
+>>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
+    </style>
+  {% endblock %}
