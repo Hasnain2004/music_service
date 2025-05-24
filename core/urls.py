@@ -1,4 +1,5 @@
-from django.urls import path
+from django.urls import path, include
+from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
@@ -26,4 +27,5 @@ urlpatterns = [
     path('api/playlists/', views.get_user_playlists, name='get_user_playlists'),
     path('admin/core/genre/', views.manage_genres, name='manage_genres'),
     path('genres/<int:genre_id>/', views.genre_detail, name='genre_detail'),
+    path('social-auth/', include('social_django.urls', namespace='social')),
 ] 

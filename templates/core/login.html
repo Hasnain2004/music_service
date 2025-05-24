@@ -76,6 +76,17 @@
                 <div class="d-grid">
                   <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
                 </div>
+                <div class="social-container">
+                  <button class="google-btn">
+                    <a href="{% url 'social:begin' 'google-oauth2' %}">
+                      <img src="https://www.google.com/favicon.ico"
+                           alt="Google"
+                           width="18"
+                           height="18">
+                      Sign in with Google
+                    </a>
+                  </button>
+                </div>
               </form>
               <div class="text-center mt-4">
                 <p class="mb-0 text-white">
@@ -149,6 +160,59 @@
   .form-check-input:checked {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
+  }
+
+  /* Google Sign-in Button Styles */
+  .social-container {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .google-btn {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .google-btn:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .google-btn a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #757575;
+    font-weight: 500;
+  }
+
+  .google-btn img {
+    margin-right: 10px;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    color: var(--text-secondary);
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .divider span {
+    padding: 0 10px;
   }
   </style>
 {% endblock %}

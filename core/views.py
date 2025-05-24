@@ -28,6 +28,10 @@ class LoginRequiredMiddleware:
             'about',
             'contact',
             'logout',
+            'social:begin',
+            'social:complete',
+            'social:disconnect',
+            'social:disconnect_individual',
         ]
 
     def __call__(self, request):
@@ -40,6 +44,10 @@ class LoginRequiredMiddleware:
                 
             # Allow access to static files and media
             if request.path.startswith('/static/') or request.path.startswith('/media/'):
+                return self.get_response(request)
+                
+            # Allow access to social auth URLs
+            if request.path.startswith('/social-auth/'):
                 return self.get_response(request)
                 
             # Redirect to login for all other URLs
@@ -109,6 +117,38 @@ def contact(request):
             messages.error(request, 'Please fill in all required fields.')
     
     return render(request, 'core/contact.html')
+def login_view(request):
+    """View for user login"""
+    if request.user.is_authenticated:
+        return redirect('index')
+        
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        remember_me = request.POST.get('remember_me')
+        
+        user = authenticate(username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            
+            # Set session expiry based on remember me
+            if not remember_me:
+                request.session.set_expiry(0)  # Session expires when browser closes
+            
+            # Get the next parameter from the request
+            next_url = request.POST.get('next') or request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('index')
+        else:
+            messages.error(request, 'Invalid username or password.')
+            
+    # Pass the next parameter to the template
+    next_url = request.GET.get('next', '')
+    return render(request, 'core/login.html', {'next': next_url})
+
 
 def register(request):
     """User registration view"""
@@ -140,33 +180,15 @@ def register(request):
         
     return render(request, 'core/register.html')
 
-def login_view(request):
-    """View for user login"""
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        
-        user = authenticate(username=username, password=password)
-        
-        if user is not None:
-            login(request, user)
-            
-            # Get the next parameter from the request
-            next_url = request.POST.get('next') or request.GET.get('next')
-            if next_url:
-                return redirect(next_url)
-            else:
-                return redirect('index')
-        else:
-            messages.error(request, 'Invalid username or password.')
-            
-    # Pass the next parameter to the template
-    next_url = request.GET.get('next', '')
-    return render(request, 'core/login.html', {'next': next_url})
-
 @login_required
 def logout_view(request):
     """User logout view"""
+    # Clear social auth session data
+    if 'social_auth_last_login_backend' in request.session:
+        del request.session['social_auth_last_login_backend']
+    if 'social_auth_backend' in request.session:
+        del request.session['social_auth_backend']
+    
     logout(request)
     return redirect('index')
 
