@@ -12,7 +12,6 @@
           {% if genre.image %}
             <img src="{{ genre.image.url }}"
                  alt="{{ genre.name }}"
-<<<<<<< HEAD
                  class="img-fluid rounded shadow genre-cover"
                  width="300"
                  height="300" />
@@ -22,17 +21,6 @@
                  class="img-fluid rounded shadow genre-cover"
                  width="300"
                  height="300" />
-=======
-                 width="300"
-                 height="300"
-                 class="img-fluid rounded shadow genre-cover" />
-          {% else %}
-            <img src="{% static 'images/default-cover.png' %}"
-                 alt="{{ genre.name }}"
-                 width="300"
-                 height="300"
-                 class="img-fluid rounded shadow genre-cover" />
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
           {% endif %}
         </div>
         <div class="col-md-9">
@@ -74,7 +62,6 @@
                              width="60"
                              height="60" />
                       {% endif %}
-<<<<<<< HEAD
                       <div class="play-overlay">
                         <button class="play-btn"
                                 data-music-id="{{ music.id }}"
@@ -85,8 +72,6 @@
                           <i class="fas fa-play"></i>
                         </button>
                       </div>
-=======
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
                     </div>
                     <div class="flex-grow-1 ms-3 py-3">
                       <div class="d-flex justify-content-between align-items-center">
@@ -136,7 +121,6 @@
                   {% if related.image %}
                     <img src="{{ related.image.url }}"
                          alt="{{ related.name }}"
-<<<<<<< HEAD
                          class="related-genre-img me-2"
                          width="30"
                          height="30" />
@@ -146,17 +130,6 @@
                          class="related-genre-img me-2"
                          width="30"
                          height="30" />
-=======
-                         width="30"
-                         height="30"
-                         class="related-genre-img me-2" />
-                  {% else %}
-                    <img src="{% static 'images/default-cover.png' %}"
-                         alt="{{ related.name }}"
-                         width="30"
-                         height="30"
-                         class="related-genre-img me-2" />
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
                   {% endif %}
                   <span>{{ related.name }}</span>
                 </a>
@@ -215,15 +188,9 @@
     transform: scale(1.1);
     background-color: var(--bs-primary-darker);
   }
-<<<<<<< HEAD
 
   .text-white {
-    color: white !important;
-=======
-  
-  .text-white {
     color: white;
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
   }
   </style>
 {% endblock %}

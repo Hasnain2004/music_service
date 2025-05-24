@@ -63,19 +63,11 @@
                     {% if user.profile_image %}
                       <img src="{{ user.profile_image.url }}"
                            alt="{{ user.username }}"
-<<<<<<< HEAD
                            class="rounded-circle profile-preview me-3"
                            width="60"
                            height="60" />
                     {% else %}
                       <div class="rounded-circle profile-placeholder me-3 d-flex align-items-center justify-content-center bg-secondary">
-=======
-                           class="rounded-circle me-3 profile-preview"
-                           width="60"
-                           height="60" />
-                    {% else %}
-                      <div class="rounded-circle me-3 d-flex align-items-center justify-content-center bg-secondary profile-placeholder">
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
                         <i class="fas fa-user"></i>
                       </div>
                     {% endif %}
@@ -147,17 +139,5 @@
     color: var(--text-secondary);
     font-size: 0.85rem;
   }
-<<<<<<< HEAD
-
-  .profile-preview {
-    object-fit: cover;
-  }
-
-  .profile-placeholder {
-    width: 60px;
-    height: 60px;
-  }
-=======
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
   </style>
 {% endblock %}

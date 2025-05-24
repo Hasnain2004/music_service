@@ -25,13 +25,8 @@
                   <table class="table table-hover">
                     <thead>
                       <tr>
-<<<<<<< HEAD
                         <th class="col-name">Name</th>
                         <th class="col-image">Image</th>
-=======
-                        <th>Name</th>
-                        <th>Image</th>
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
                         <th>Description</th>
                         <th>Created</th>
                         <th>Actions</th>
@@ -153,11 +148,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-<<<<<<< HEAD
-          <h5 class="modal-title text-dark">Edit Genre</h5>
-=======
           <h5 class="modal-title">Edit Genre</h5>
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
           <button type="button"
                   class="btn-close"
                   data-bs-dismiss="modal"
@@ -171,50 +162,21 @@
           <input type="hidden" name="genre_id" id="edit-genre-id" />
           <div class="modal-body">
             <div class="mb-3">
-<<<<<<< HEAD
-              <label for="edit-genre-name" class="form-label text-dark">Genre Name</label>
-              <input type="text"
-                     class="form-control text-dark"
-=======
               <label for="edit-genre-name" class="form-label">Genre Name</label>
               <input type="text"
                      class="form-control"
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
                      id="edit-genre-name"
                      name="name"
                      required />
             </div>
             <div class="mb-3">
-<<<<<<< HEAD
-              <label for="edit-genre-description" class="form-label text-dark">Description (Optional)</label>
-              <textarea class="form-control text-dark"
-=======
               <label for="edit-genre-description" class="form-label">Description (Optional)</label>
               <textarea class="form-control"
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
                         id="edit-genre-description"
                         name="description"
                         rows="3"></textarea>
             </div>
             <div class="mb-3">
-<<<<<<< HEAD
-              <label for="edit-genre-image" class="form-label text-dark">Genre Image (Optional)</label>
-              <div class="current-cover mb-2 d-none">
-                <p class="form-text text-dark">Current cover image:</p>
-                <img id="current-cover-preview"
-                     src=""
-                     alt=""
-                     width="100"
-                     height="100"
-                     class="img-thumbnail current-image" />
-              </div>
-              <input type="file"
-                     class="form-control text-dark"
-                     id="edit-genre-image"
-                     name="image"
-                     accept="image/*" />
-              <div class="form-text text-dark">Optional: Upload a new cover image for your playlist</div>
-=======
               <label for="edit-genre-image" class="form-label">Genre Image (Optional)</label>
               <input type="file"
                      class="form-control"
@@ -230,10 +192,10 @@
                 <img src=""
                      alt="Current genre image"
                      id="current-genre-image"
-                     style="max-width: 100%;
-                            max-height: 150px" />
+                     width="150"
+                     height="150"
+                     class="preview-image" />
               </div>
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
             </div>
           </div>
           <div class="modal-footer">
@@ -277,7 +239,6 @@
     </div>
   </div>
 {% endblock %}
-<<<<<<< HEAD
 {% block extra_css %}
   <style>
   .col-name {
@@ -295,10 +256,13 @@
   .current-image {
     object-fit: cover;
   }
+
+  .preview-image {
+    max-width: 100%;
+    max-height: 150px;
+  }
   </style>
 {% endblock %}
-=======
->>>>>>> d21b0eef922800e0acc3f93c4a714125fa693f34
 {% block extra_js %}
   <script>
   $(document).ready(function () {
