@@ -1,0 +1,82 @@
+{% extends 'music/base.html' %}
+{% load music_extras %}
+
+{% block title %}
+  Home - Music Service
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    {% if not user.is_authenticated %}
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        Please <a href="{% url 'login' %}">log in</a> to rate songs and track your listening history.
+      </div>
+    {% endif %}
+
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form method="get" class="d-flex">
+          <input type="text" name="search" class="form-control me-2" placeholder="Search songs..." value="{{ request.GET.search }}" />
+          <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+      </div>
+      <div class="col-md-6">
+        <form method="get" class="d-flex">
+          <select name="genre" class="form-select me-2">
+            <option value="">All Genres</option>
+            {% for genre in genres %}
+              <option value="{{ genre }}" {% if request.GET.genre == genre %}selected{% endif %}>{{ genre }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="row">
+      {% for song in songs %}
+        <div class="col-md-4 mb-4">
+          <div class="card h-100">
+            {% if song.cover_image %}
+              <img src="{{ song.cover_image.url }}" class="card-img-top" alt="{{ song.title }}" style="height: 200px; object-fit: cover;" />
+            {% else %}
+              <img src="/static/images/default-cover.jpg" class="card-img-top" alt="Default Cover" style="height: 200px; object-fit: cover;" />
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ song.title }}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">{{ song.artist }}</h6>
+              <p class="card-text">
+                <small class="text-muted">
+                  Genre: {{ song.genre }}<br />
+                  Duration: {{ song.duration }}
+                </small>
+              </p>
+              {% if song.avg_rating %}
+                <div class="text-warning">
+                  {% for i in "12345"|make_list %}
+                    {% if forloop.counter <= song.avg_rating %}
+                      <i class="fas fa-star"></i>
+                    {% else %}
+                      <i class="far fa-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                  <small class="text-muted">({{ song.avg_rating|floatformat:1 }})</small>
+                </div>
+              {% else %}
+                <p class="text-muted">No ratings yet</p>
+              {% endif %}
+            </div>
+            <div class="card-footer">
+              <a href="{% url 'song-detail' song.id %}" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12">
+          <p class="text-center">No songs found.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'music/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  Profile - Music Service
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <div class="card-body text-center">
+            {% if user.userprofile.profile_photo %}
+              <img src="{{ user.userprofile.profile_photo.url }}" alt="Profile Photo" class="rounded-circle img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;" />
+            {% else %}
+              <img src="/static/images/default-profile.png" alt="Default Profile" class="rounded-circle img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;" />
+            {% endif %}
+            <h4>{{ user.username }}</h4>
+            {% if user.first_name or user.last_name %}
+              <p class="text-muted">{{ user.first_name }} {{ user.last_name }}</p>
+            {% endif %}
+            <p class="text-muted">{{ user.email }}</p>
+            <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Recently Played</h5>
+            {% if user_sessions %}
+              <div class="list-group">
+                {% for session in user_sessions %}
+                  <a href="{% url 'song-detail' session.song.id %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h6 class="mb-1">{{ session.song.title }}</h6>
+                      <small class="text-muted">{{ session.last_played|timesince }} ago</small>
+                    </div>
+                    <p class="mb-1">{{ session.song.artist }}</p>
+                  </a>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-muted">No songs played yet.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Your Ratings</h5>
+            {% if user_ratings %}
+              <div class="list-group">
+                {% for rating in user_ratings %}
+                  <a href="{% url 'song-detail' rating.song.id %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h6 class="mb-1">{{ rating.song.title }}</h6>
+                      <div class="text-warning">
+                        {% for i in '12345'|make_list %}
+                          {% if forloop.counter <= rating.rating %}
+                            <i class="fas fa-star"></i>
+                          {% else %}
+                            <i class="far fa-star"></i>
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    </div>
+                    <p class="mb-1">{{ rating.song.artist }}</p>
+                    <small class="text-muted">Rated {{ rating.created_at|timesince }} ago</small>
+                  </a>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-muted">No ratings yet.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

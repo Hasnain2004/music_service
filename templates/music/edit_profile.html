@@ -1,0 +1,30 @@
+{% extends 'music/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  Edit Profile - Music Service
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="text-center mb-4">Edit Profile</h2>
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ form|crispy }}
+              <div class="d-grid gap-2">
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+              </div>
+            </form>
+            <div class="text-center mt-3">
+              <a href="{% url 'profile' %}" class="btn btn-link">Back to Profile</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
